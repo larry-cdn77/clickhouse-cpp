@@ -172,7 +172,7 @@ Client::Impl::Impl(const ClientOptions& opts)
             break;
         } catch (const std::system_error&) {
             if (++i > options_.send_retries) {
-                throw;
+                throw std::runtime_error("Impl");
             }
 
             std::this_thread::sleep_for(options_.retry_timeout);
@@ -768,7 +768,7 @@ void Client::Impl::RetryGuard(std::function<void()> func) {
             }
 
             if (!ok && i == options_.send_retries) {
-                throw;
+                throw std::runtime_error("RetryGuard");
             }
         }
     }
