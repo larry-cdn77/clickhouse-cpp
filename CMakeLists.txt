@@ -43,3 +43,5 @@ PROJECT (CLICKHOUSE-CLIENT)
             ut
         )
 	ENDIF (BUILD_TESTS)
+
+    SUBDIRS(producer)
