@@ -1,3 +1,3 @@
 #!/bin/sh
 set -x
-producer $1 $2.insert_test $3 5000000
+producer $1 $2.clickhouse_cpp $3 5000000
