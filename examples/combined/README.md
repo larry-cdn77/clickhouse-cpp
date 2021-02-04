@@ -12,15 +12,18 @@ Usage:
 
     make -C ../../build producer
     sh create.sh SPEC
-    time PATH=../../build/producer:$PATH sh run.sh $host1_ip 1 &
-    time PATH=../../build/producer:$PATH sh run.sh $host2_ip 2 &
-    time PATH=../../build/producer:$PATH sh run.sh $host3_ip 3 &
-    wait
-    sh stats.sh SPEC
+    ( PATH+=:../../build/producer
+      sh run.sh $host1_ip db1 0 &
+      sh run.sh $host2_ip db2 1 &
+      sh run.sh $host3_ip db3 2 &
+      wait )
+    sh check.sh SPEC
     sh drop.sh SPEC
 
-The last argument to the run script is a marker to tell rows apart when read
-back
+In the above, shards 1, 2 and 3 are configured with databases `db1`, `db2` and
+`db3`, respectively. Run scripts arguments after IP address are database name
+to insert to and a sequence number so row IDs can be unique within a test run
+not just for each host.
 
 SPEC is of the form:
 
@@ -31,9 +34,8 @@ in `remote_server` section of config.xml under the name:
 
     clickhouse_cluster
 
-Replicas of data for shard 1, 2 and 3 is under database `db1`, `db2` and `db3`,
-respectively. The first database listed in SPEC for each host corresponds to the
-primary replica 1, followed by databases for one or more secondary replicas.
+The first database listed in SPEC for each host corresponds to the primary
+replica 1, followed by databases for one or more secondary replicas.
 
 Replicas are defined in ZooKeeper with path prefix:
 

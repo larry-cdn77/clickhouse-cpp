@@ -1,12 +1,12 @@
 #!/bin/sh
-replica=1
+r=1
 while [ $# -gt 0 ] ; do
-  echo "CREATE TABLE clickhouse_cpp ( time dateTime, id UInt64 ) ENGINE =
-    ReplicatedMergeTree('/clickhouse/tables/default/clickhouse_cpp', '$replica')
-    ORDER BY time PARTITION BY toYYYYMM(time);
-    SHOW CREATE clickhouse_cpp FORMAT Vertical;
+  echo "CREATE TABLE clickhouse_cpp ( time dateTime, id UInt32 ) ENGINE =
+    ReplicatedMergeTree('/clickhouse/tables/default/clickhouse_cpp', '$r')
+    ORDER BY time
+    PARTITION BY toYYYYMM(time);
     ALTER TABLE system.query_log DELETE WHERE 1;" |
-  ssh $1 clickhouse-client -n --echo
-  let replica++
+    ssh $1 clickhouse-client -n || exit $?
+  let r++
   shift
 done

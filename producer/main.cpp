@@ -16,12 +16,12 @@ void signalHandler(int sig)
 int main(int argc, char * argv[])
 {
     if (argc != 5) {
-        std::cout << "usage: producer HOST_IP TABLE MARKER NUM_ROWS" << std::endl;
+        std::cout << "usage: producer HOST_IP TABLE START NUM_ROWS" << std::endl;
         return 1;
     }
     std::string host_ip = argv[1];
     std::string table = std::string(argv[2]);
-    unsigned marker = std::stoi(argv[3]);
+    unsigned start = std::stoi(argv[3]);
     unsigned num_rows = std::stoi(argv[4]);
     try {
         clickhouse::Client client(clickhouse::ClientOptions().
@@ -31,13 +31,13 @@ int main(int argc, char * argv[])
         std::signal(SIGINT, signalHandler);
         clickhouse::Block block;
         auto time = std::make_shared<clickhouse::ColumnDateTime>();
-        auto id = std::make_shared<clickhouse::ColumnUInt64>();
+        auto id = std::make_shared<clickhouse::ColumnUInt32>();
         for (unsigned r = 0; r < num_rows; r++) {
             if (sigint) {
                 break;
             }
-            time->Append(static_cast<std::time_t>(1611161143 + r)); // 1611161143 is 20 Jan 2021 17:45:43
-            id->Append(((unsigned long)marker << 32) | r);
+            time->Append(static_cast<std::time_t>(1611161143 + (start + r))); // 1611161143 is 20 Jan 2021 17:45:43
+            id->Append(start + r);
         }
         block.AppendColumn("time", time);
         block.AppendColumn("id", id);
